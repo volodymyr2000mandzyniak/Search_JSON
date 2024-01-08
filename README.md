@@ -1,24 +1,19 @@
-# README
+# SearchApp
 
-This README would normally document whatever steps are necessary to get the
-application up and running.
+SearchApp є простим веб-застосунком, який дозволяє вам шукати дані в заздалегідь завантаженому наборі даних.
 
-Things you may want to cover:
+## Встановлення
 
-* Ruby version
+1. Клонуйте репозиторій: `git clone https://github.com/yourusername/SearchApp.git`
+2. Перейдіть у каталог проекту: `cd SearchApp`
+3. Встановіть геми та залежності: `bundle install`
+4. Запустіть міграції бази даних: `rails db:migrate`
+5. Запустіть сервер: `rails server`
 
-* System dependencies
+## Використання
 
-* Configuration
+1. Перейдіть за посиланням [http://localhost:3000](http://localhost:3000) у своєму веб-браузері.
+2. Натискайте на кнопку "Search" для введення запиту та отримання результатів.
+3. ...
 
-* Database creation
 
-* Database initialization
-
-* How to run the test suite
-
-* Services (job queues, cache servers, search engines, etc.)
-
-* Deployment instructions
-
-* ...
