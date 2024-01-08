@@ -1,0 +1,13 @@
+<div class="search-container text-center">
+  <h1>Programming Language Search</h1>
+  <form id="searchForm">
+  <h4 id="totalDataCount">Total Data Count: <%= @total_data_count %></h4>
+    <div class="input-container">
+      <input type="text" id="searchInput" placeholder="Type to search..." oninput="search()">
+      <span class="clear-input" onclick="clearSearch()">✖</span>
+    </div>
+  </form>
+
+  <ul id="searchResults"></ul>
+</div>
+

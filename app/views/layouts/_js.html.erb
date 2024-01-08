@@ -1,0 +1,69 @@
+<script>
+ // Функція пошуку
+function search() {
+  const query = document.getElementById('searchInput').value.trim();
+
+  // Перевірка чи заповнене поле пошуку
+  if (query !== '') {
+    // Виклик API для отримання результатів пошуку
+    fetch(`/search?query=${query}`)
+      .then(response => response.json())
+      .then(data => displayResults(data, query)); // Виклик функції відображення результатів
+  } else {
+    clearResults(); // Якщо поле пошуку порожнє, очистити результати
+  }
+}
+
+// Функція відображення результатів
+function displayResults(results, query) {
+  const resultsList = document.getElementById('searchResults');
+  resultsList.innerHTML = '';
+
+  const countElement = document.createElement('p');
+  countElement.innerHTML = `Found ${results.length} result(s) for "${query}"`; // Виведення кількості знайдених результатів
+  resultsList.appendChild(countElement);
+
+  results.forEach(result => {
+    const listItem = createResultItem(result, query);
+    resultsList.appendChild(listItem);
+  });
+}
+
+
+// Функція створення елемента для кожного результату
+function createResultItem(result, query) {
+  const listItem = document.createElement('li');
+  listItem.className = 'resultItem';
+
+  const fields = ['Name', 'Type', 'Designed by'];
+  fields.forEach(field => {
+    const fieldElement = createParagraph(`${field}: ${result[field]}`, query); // Створення елемента для кожного поля результату
+    listItem.appendChild(fieldElement); // Додавання елемента до елемента списку
+  });
+
+  return listItem;
+}
+
+// Функція створення елемента для кожного поля результату
+function createParagraph(text, query) {
+  const paragraph = document.createElement('p');
+  const span = document.createElement('span');
+  span.innerHTML = text.replace(new RegExp(`(${query})`, 'gi'), '<mark>$1</mark>'); // Підсвічування тексту, який відповідає запиту
+  paragraph.appendChild(span);
+  paragraph.style.margin = '5px 0'; // Зменшення відстані між рядками
+  return paragraph;
+}
+
+// Функція очищення результатів
+function clearResults() {
+  const resultsList = document.getElementById('searchResults');
+  resultsList.innerHTML = '';
+}
+
+// Функція очищення поля пошуку
+function clearSearch() {
+  document.getElementById('searchInput').value = '';
+  clearResults();
+}
+
+</script>
