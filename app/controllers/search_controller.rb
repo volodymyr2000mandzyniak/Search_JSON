@@ -1,22 +1,26 @@
 class SearchController < ApplicationController
-  # Викликається перед виконанням дій index та search для завантаження даних
   before_action :load_data, only: [:index, :search]
 
-  # Дія для відображення початкової сторінки
   def index
     @total_data_count = @data.count
   end
 
-  # Дія для пошуку даних за запитом користувача
   def search
     query = params[:query].to_s.downcase
-    # Вибираємо дані, які відповідають запиту
+    positive_query, negative_query = extract_queries(query)
+
+    # Фільтрація результатів за позитивним і негативним запитами
     results = @data.select do |item|
-      item.values.any? { |value| value.to_s.downcase.include?(query) }
+      positive_match = positive_match?(item, positive_query)
+      negative_match = negative_match?(item, negative_query)
+
+      positive_match && !negative_match
     end
 
-    # Виводимо результати у форматі JSON
-    render json: results
+    # Сортування результатів за релевантністю (кількістю збігів)
+    sorted_results = results.sort_by { |item| relevance_score(item, positive_query) }.reverse
+
+    render json: sorted_results
   end
 
   private
@@ -25,5 +29,43 @@ class SearchController < ApplicationController
   def load_data
     data_file_path = Rails.root.join('config', 'data', 'data.json')
     @data = JSON.parse(File.read(data_file_path))
+  end
+
+  # Виділення позитивних та негативних запитів
+  def extract_queries(query)
+    positive_query = query.scan(/\w+/)
+    negative_query = query.scan(/-(\w+)/).flatten
+    [positive_query, negative_query]
+  end
+
+  # Перевірка збігу за позитивним запитом
+  def positive_match?(item, positive_query)
+    positive_query.all? do |pos_word|
+      if pos_word.include?(' ')
+        subwords = pos_word.split(' ')
+        subwords.any? { |subword| item.values.any? { |value| value.to_s.downcase.include?(subword) } }
+      else
+        item.values.any? { |value| value.to_s.downcase.include?(pos_word) }
+      end
+    end
+  end
+
+  # Перевірка збігу за негативним запитом
+  def negative_match?(item, negative_query)
+    negative_query.any? do |neg_word|
+      item.values.any? { |value| value.to_s.downcase.include?(neg_word) }
+    end
+  end
+
+  # Оцінка релевантності (кількість збігів) для сортування результатів
+  def relevance_score(item, positive_query)
+    positive_query.count do |pos_word|
+      if pos_word.include?(' ')
+        subwords = pos_word.split(' ')
+        subwords.any? { |subword| item.values.any? { |value| value.to_s.downcase.include?(subword) } }
+      else
+        item.values.any? { |value| value.to_s.downcase.include?(pos_word) }
+      end
+    end
   end
 end
