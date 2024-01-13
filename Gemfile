@@ -38,15 +38,20 @@ gem "bootsnap", require: false
 group :development, :test do
   # See https://guides.rubyonrails.org/debugging_rails_applications.html#debugging-with-the-debug-gem
   gem "debug", platforms: %i[ mri windows ]
-  gem 'rspec-rails', '~> 5.0'
+  gem 'simplecov', require: false
+  gem 'rspec-rails'
   gem 'factory_bot_rails'
-  gem 'shoulda-matchers'
-  gem 'rubocop', require: false
+  gem 'rails-controller-testing'
 end
 
 group :development do
   # Use console on exceptions pages [https://github.com/rails/web-console]
   gem "web-console"
+  gem 'rubocop', "~> 1.58.0", require: false
+  gem 'rubocop-rails', "~> 2.22.2", require: false
+  gem 'rubocop-rspec', '~> 2.26.1', require: false
+
+  gem 'rubocop-performance', '1.20.2'
 
   gem "error_highlight", ">= 0.4.0", platforms: [:ruby]
 end

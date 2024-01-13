@@ -1,1 +1,59 @@
+# .rubocop.yml
+
 inherit_from: .rubocop_todo.yml
+require:
+  - rubocop-performance
+  - rubocop-factory_bot
+  - rubocop-rails
+
+AllCops:
+  SuggestExtensions: false
+
+# Основні правила для стилю коду
+Layout/LineLength:
+  Max: 120
+
+# Виключення вже застосованих Metrics/BlockLength
+Metrics/BlockLength:
+  Exclude:
+    - 'spec/**/*'
+
+# Додані правила для контролера, модуля та тестів
+Layout/EmptyLines:
+  Include:
+    - 'app/controllers/search_controller.rb'
+    - 'app/controllers/concerns/searchable.rb'
+    - 'spec/controllers/search_controller_spec.rb'
+    - 'spec/controllers/searchable_spec.rb'
+
+# Правила для Ruby on Rails
+Rails/DefaultScope:
+  Enabled: false
+
+Rails/FindBy:
+  Enabled: true
+
+# Правила для оптимізації виконання коду
+Performance/RegexpMatch:
+  Enabled: true
+
+Performance/OpenStruct:
+  Enabled: true
+
+
+Rails:
+  Enabled: false
+
+# Додані правила для вирівнювання та коментарів
+Layout/IndentationWidth:
+  Width: 2
+
+# Вирівнювання параметрів методів
+Layout/ArgumentAlignment:
+  EnforcedStyle: with_fixed_indentation
+
+
+
+# Додавання коментарів перед пустими строками
+Layout/EmptyLineAfterMagicComment:
+  EnforcedStyle: present
