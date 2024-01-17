@@ -13,13 +13,15 @@ module Searchable
 
   # Метод для фільтрації та сортування результатів за позитивними та негативними запитами.
   def filter_and_sort_results(positive_query, negative_query)
-    exact_match_results = @data.select do |item|
-      positive_match?(item, positive_query) && !negative_match?(item, negative_query)
-    end.select { |item| item.values.any? { |value| value.to_s.downcase.start_with?(positive_query.first) } }
-
-    partial_match_results = @data.select do |item|
-      positive_match?(item, positive_query) && !negative_match?(item, negative_query)
-    end.reject { |item| item.values.any? { |value| value.to_s.downcase.start_with?(positive_query.first) } }
+    exact_match_results, partial_match_results = @data.each_with_object([[], []]) do |item, (exact_match, partial_match)|
+      if positive_match?(item, positive_query) && !negative_match?(item, negative_query)
+        if item.values.any? { |value| value.to_s.downcase.start_with?(positive_query.first) }
+          exact_match << item
+        else
+          partial_match << item
+        end
+      end
+    end
 
     exact_match_results.sort_by { |item| relevance_score(item, positive_query) }.reverse +
       partial_match_results.sort_by { |item| relevance_score(item, positive_query) }.reverse
@@ -28,7 +30,6 @@ module Searchable
   # Метод для перевірки збігу за позитивним запитом.
   def positive_match?(item, positive_query)
     positive_query.all? do |pos_word|
-      regex = Regexp.new(Regexp.escape(pos_word), Regexp::IGNORECASE)
       subwords = pos_word.split(' ')
 
       if subwords.size > 1
@@ -36,7 +37,8 @@ module Searchable
           item.values.any? { |value| value.to_s.downcase =~ /\b#{Regexp.escape(subword)}\b/ }
         end
       else
-        item.values.any? { |value| value.to_s.downcase =~ regex }
+        query_term = positive_query.first.to_s
+        !query_term.empty? && item.values.any? { |value| value.to_s.downcase.include?(query_term) }
       end
     end
   end
@@ -44,7 +46,10 @@ module Searchable
   # Метод для перевірки збігу за негативним запитом.
   def negative_match?(item, negative_query)
     negative_query.any? do |neg_word|
-      item.values.none? { |value| value.to_s.downcase.include?(neg_word) }
+      neg_word.downcase!
+      neg_word.slice!(0) if neg_word.start_with?('-')
+
+      item.values.any? { |value| value.to_s.downcase.include?(neg_word) }
     end
   end
 
@@ -57,7 +62,7 @@ module Searchable
           item.values.any? { |value| value.to_s.downcase.start_with?(subword) }
         end
       else
-        item.values.count { |value| value.to_s.downcase.start_with?(pos_word) }
+        item.values.count { |value| value.to_s.downcase.include?(pos_word) }
       end
     end
 

@@ -56,7 +56,7 @@ RSpec.describe SearchableController, type: :controller do
 
     it 'checks negative match' do
       negative_query = ['orange']
-      expect(controller.send(:negative_match?, item, negative_query)).to be_truthy
+      expect(controller.send(:negative_match?, item, negative_query)).to be_falsey
     end
   end
 

@@ -24,7 +24,7 @@ class SearchController < ApplicationController
 
   # Метод для завантаження даних з файлу перед викликом екшенів index та search.
   def load_data
-    data_file_path = Rails.root.join('config', 'data', 'data.json')
+    data_file_path = Rails.root.join("config/data/data.json")
     @data = JSON.parse(File.read(data_file_path))
   end
 end
